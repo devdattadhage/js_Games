@@ -1,4 +1,4 @@
-const boxRxC = 7;
+const boxSize = 7;
 const exit = 1;
 const safePath1 = "49 48 41 34 27 20 19 18 25 32 31 30 23 16 15 8 1";
 const safePath2 = "49 42 41 40 33 26 25 24 31 30 29 22 15 16 9 2 1";
@@ -6,9 +6,6 @@ const safePath3 = "49 48 47 40 33 26 27 20 13 12 11 10 17 16 15 8 1";
 const safePath4 = "49 48 47 46 45 38 31 24 25 26 19 12 11 10 3 2 1";
 const safePath5 = "49 48 41 40 39 38 31 24 25 26 27 20 13 12 5 4 3 10 9 8 1";
 const safePath6 = "49 48 47 40 39 32 31 24 17 18 19 12 5 4 3 2 1";
-
-let attemptsRemaining = 10;
-let currentPosition = 49;
 
 function getRandomSafePath() {
   const pathNumber = Math.ceil(Math.random() * 6);
@@ -40,7 +37,6 @@ function isSubstring(string, subString) {
   if (subString === "") {
     return false;
   }
-
   for (let index = 0; index <= string.length - subString.length; index++) {
     if (matchAtPosition(string, subString, index)) {
       return true;
@@ -50,33 +46,27 @@ function isSubstring(string, subString) {
   return false;
 }
 
-function attemptInfo() {
-  return "\n\n  Remaining Attempts : " + attemptsRemaining;
-}
-
 function getBombMSG() {
   return "\n  You Stepped on Mine 💣 !!! ";
 }
 
-function createBox(path) {
+function createBox(path, currentPosition) {
   let box = "\n  ";
 
-  for (let index = 1; index <= boxRxC * boxRxC; index++) {
+  for (let index = 1; index <= boxSize * boxSize; index++) {
     box += index === currentPosition ? "🟩" : "⬜";
 
-    if (index % boxRxC === 0) {
+    if (index % boxSize === 0) {
       box += " \n  ";
-
     }
     if (!isSubstring(path, currentPosition)) {
       currentPosition = 49;
-      attemptsRemaining--;
-
       console.log(getBombMSG());
     }
   }
+  console.log(box);
 
-  return console.log(box);
+  return currentPosition;
 }
 
 function warningMsg() {
@@ -84,30 +74,30 @@ function warningMsg() {
 }
 
 function moveUp(currentPosition) {
-  const moveUpPossible = currentPosition > boxRxC;
+  const moveUpPossible = currentPosition > boxSize;
 
-  return moveUpPossible ? currentPosition - boxRxC : currentPosition;
+  return moveUpPossible ? currentPosition - boxSize : currentPosition;
 }
 
 function moveDown(currentPosition) {
-  const moveDownPossible = currentPosition < (boxRxC * boxRxC) - 6;
+  const moveDownPossible = currentPosition < (boxSize * boxSize) - 6;
 
-  return moveDownPossible ? currentPosition + boxRxC : currentPosition;
+  return moveDownPossible ? currentPosition + boxSize : currentPosition;
 }
 
 function moveLeft(currentPosition) {
-  const moveLeftPossible = currentPosition % boxRxC === 1;
+  const moveLeftPossible = currentPosition % boxSize === 1;
 
   return moveLeftPossible ? currentPosition : currentPosition - 1;
 }
 
 function moveRight(currentPosition) {
-  const moveRightPossible = currentPosition % boxRxC === 0;
+  const moveRightPossible = currentPosition % boxSize === 0;
 
   return moveRightPossible ? currentPosition : currentPosition + 1;
 }
 
-function controller(userInput) {
+function controller(userInput, currentPosition) {
   if (userInput === 'w' || userInput === 'W') {
     return moveUp(currentPosition);
   }
@@ -135,26 +125,31 @@ function directionInfo() {
   return "\n  Move ⬆️ : W | Move ⬇️ : S | Move ➡️ : D | Move ⬅️ : A";
 }
 
-function displayInfo() {
-  return directionInfo() + attemptInfo();
+function attemptInfo(trialsLeft) {
+  return "\n\n  Remaining Attempts : " + trialsLeft;
 }
 
-function initiateMineField(path, userName) {
-  console.clear();
-  createBox(path);
+function displayInfo(trialsLeft) {
+  return directionInfo() + attemptInfo(trialsLeft);
+}
 
-  if (attemptsRemaining < 2) {
-    return `\n  💀 ${userName} you are Dead ⚰️ !! Better Luck In Next Life! ☮️\n`;
+function initiateMineField(path, userName, currentPosition, trialsLeft) {
+  console.clear();
+  currentPosition = createBox(path, currentPosition);
+
+  if (trialsLeft < 1) {
+    return "\n 💀" + userName + " You're Dead ⚰️ Better Luck In Next Life! ☮️\n";
   }
   if (currentPosition === exit) {
-    return `\n  🎉🎉 Congratulations ${userName} 🤩!! You Won 🎉🎉\n`;
+    return "\n 🎉🎉 Congratulations " + userName + " 🤩!! You Won 🎉🎉\n";
   }
 
-  console.log(displayInfo());
+  console.log(displayInfo(trialsLeft));
   const userInput = getUserInput();
-  currentPosition = controller(userInput);
+  currentPosition = controller(userInput, currentPosition);
+  trialsLeft -= isSubstring(path, currentPosition) ? 0 : 1;
 
-  return initiateMineField(path, userName);
+  return initiateMineField(path, userName, currentPosition, trialsLeft);
 }
 
 function gameInfo() {
@@ -168,8 +163,15 @@ function gameInfo() {
   return game + hint + drawBack + goal + rule + currPos;
 }
 
-console.log(gameInfo());
+function beginGame() {
+  console.log(gameInfo());
 
-const userName = prompt("\n  🙏🏼 Please Enter Your Name To Continue : ");
-const path = getRandomSafePath();
-console.log(initiateMineField(path, userName));
+  let trialsLeft = 10;
+  let currentPosition = 49;
+  const userName = prompt("\n  🙏🏼 Please Enter Your Name To Continue : ");
+  const path = getRandomSafePath();
+
+  console.log(initiateMineField(path, userName, currentPosition, trialsLeft));
+}
+
+beginGame();
