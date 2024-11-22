@@ -6,6 +6,7 @@ const safePath3 = "49 48 47 40 33 26 27 20 13 12 11 10 17 16 15 8 1";
 const safePath4 = "49 48 47 46 45 38 31 24 25 26 19 12 11 10 3 2 1";
 const safePath5 = "49 48 41 40 39 38 31 24 25 26 27 20 13 12 5 4 3 10 9 8 1";
 const safePath6 = "49 48 47 40 39 32 31 24 17 18 19 12 5 4 3 2 1";
+
 let attemptsRemaining = 10;
 let currentPosition = 49;
 
@@ -57,58 +58,77 @@ function getBombMSG() {
   return "\n  You Stepped on Mine 💣 !!! ";
 }
 
-function createBox(selectSafePath) {
-  let boxIndex = 0;
-  let box = "";
+function createBox(path) {
+  let box = "\n  ";
 
-  for (let row = 0; row < boxRxC; row++) {
-    box += "\n  ";
-    for (let column = 0; column < boxRxC; column++) {
-      boxIndex++;
-      box += boxIndex === currentPosition ? "🟩" : "⬜";
+  for (let index = 1; index <= boxRxC * boxRxC; index++) {
+    box += index === currentPosition ? "🟩" : "⬜";
 
-      if (!isSubstring(selectSafePath, currentPosition)) {
-        currentPosition = 49;
-        attemptsRemaining--;
+    if (index % boxRxC === 0) {
+      box += " \n  ";
 
-        console.log(getBombMSG());
-      }
+    }
+    if (!isSubstring(path, currentPosition)) {
+      currentPosition = 49;
+      attemptsRemaining--;
+
+      console.log(getBombMSG());
     }
   }
 
   return console.log(box);
 }
 
-function getUserInput() {
-  return prompt("\n  Enter Direction 🧭 : ");
+function warningMsg() {
+  return "\n ⚠️  Warning!! Incorrect Direction !!! ";
 }
 
-function getWarningMsg() {
-  return "\n ⚠️  Warning!! Incorrect Direction !!! ";
+function moveUp(currentPosition) {
+  const moveUpPossible = currentPosition > boxRxC;
+
+  return moveUpPossible ? currentPosition - boxRxC : currentPosition;
+}
+
+function moveDown(currentPosition) {
+  const moveDownPossible = currentPosition < (boxRxC * boxRxC) - 6;
+
+  return moveDownPossible ? currentPosition + boxRxC : currentPosition;
+}
+
+function moveLeft(currentPosition) {
+  const moveLeftPossible = currentPosition % boxRxC === 1;
+
+  return moveLeftPossible ? currentPosition : currentPosition - 1;
+}
+
+function moveRight(currentPosition) {
+  const moveRightPossible = currentPosition % boxRxC === 0;
+
+  return moveRightPossible ? currentPosition : currentPosition + 1;
 }
 
 function controller(userInput) {
   if (userInput === 'w' || userInput === 'W') {
-    const up = currentPosition > boxRxC;
-    return up ? currentPosition - boxRxC : currentPosition;
+    return moveUp(currentPosition);
   }
   if (userInput === 's' || userInput === 'S') {
-    const down = currentPosition < (boxRxC * boxRxC) - 6;
-    return down ? currentPosition + boxRxC : currentPosition;
+    return moveDown(currentPosition);
   }
   if (userInput === 'a' || userInput === 'A') {
-    const left = currentPosition % boxRxC === 1;
-    return left ? currentPosition : currentPosition - 1;
+    return moveLeft(currentPosition);
   }
   if (userInput === 'd' || userInput === 'D') {
-    const right = currentPosition % boxRxC === 0;
-    return right ? currentPosition : currentPosition + 1;
+    return moveRight(currentPosition);
   }
 
-  console.log(getWarningMsg());
-  prompt("\n  Please Enter Valid Instruction 🙏🏼");
+  console.log(warningMsg());
+  prompt("\n 🙏🏼 Please Enter Valid Instruction ");
 
   return currentPosition;
+}
+
+function getUserInput() {
+  return prompt("\n  Enter Direction 🧭 : ");
 }
 
 function directionInfo() {
@@ -149,6 +169,7 @@ function gameInfo() {
 }
 
 console.log(gameInfo());
+
 const userName = prompt("\n  🙏🏼 Please Enter Your Name To Continue : ");
 const path = getRandomSafePath();
 console.log(initiateMineField(path, userName));
