@@ -1,0 +1,16 @@
+to do 
+
+1. create the grid of 10 X 10.✅
+2. put the number in the boxes.✅
+3. get stylish border.✅
+4. assign random mines in the grid.
+5. take input from user from 1 to 100 (isValid).
+6. check user input is mine or not 
+7. if mine exit gameEnd.
+8. if not, check all the 8 places connected to the current position.
+9. 
+
+
+
+
+******* loading bar
