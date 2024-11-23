@@ -2,20 +2,18 @@ const ROCK = '1';
 const PAPER = '2';
 const SCISSOR = '3';
 
-function createComputerChoice() {
-  const random = Math.random();
+function getComputerChoice() {
+  const choice = Math.ceil(Math.random() * 3);
 
-  if (random < 0.35) {
-    return ROCK;
-  }
-  if (random < 0.75) {
-    return PAPER;
+  switch (choice) {
+    case 1: return ROCK;
+    case 2: return PAPER;
   }
 
   return SCISSOR;
 }
 
-function createStartMessage() {
+function composeStartMessage() {
   const message = "\n Let's play Rock Paper Scissor!!\n";
   const choiceSegment = "\n 1. Rock ✊🏼\n 2. Paper 👋🏼\n 3. Scissor ✌🏼\n";
 
@@ -23,12 +21,12 @@ function createStartMessage() {
 }
 
 function gameInfo() {
-  console.log(createStartMessage());
+  console.log(composeStartMessage());
 
-  return prompt(" Choose Your Weapon :");;
+  return prompt(" Choose Your Weapon :");
 }
 
-function showWeapon(choice, text) {
+function exposeWeapon(choice, text) {
   let sign = "✌🏼 ";
 
   if (choice === '1') {
@@ -41,10 +39,14 @@ function showWeapon(choice, text) {
   return text + sign;
 }
 
-function winOrLose(choicePair) {
+function gameOutcome(choicePair, userChoice, computerChoice) {
+  if (userChoice === computerChoice) {
+    return "\n  TIE!! You Are Better Than I Thought!\n";
+  }
   if (choicePair === '13' || choicePair === '21' || choicePair === '32') {
     return "\n  Won!! You Are Good. Let's Play Again!\n"
   }
+
   return "\n  Lose!! Better Try Again !!\n"
 }
 
@@ -52,34 +54,30 @@ function isUserChoiceValid(userChoice) {
   return userChoice === '1' || userChoice === '2' || userChoice === '3';
 }
 
-function rockPaperScissor() {
+function initiateRockPaperScissor() {
   const userChoice = gameInfo();
   if (!isUserChoiceValid(userChoice)) {
-    return "\n  Choose Valid Choice !! \n"
+    return "\n  Choose Valid Choice !! \n";
   }
 
-  const computerChoice = createComputerChoice();
+  const computerChoice = getComputerChoice();
   const choicePair = userChoice + computerChoice;
-  const computerWeapon = showWeapon(computerChoice, "Computer : ");
-  const userWeapon = showWeapon(userChoice, "Player : ");
+  const computerWeapon = exposeWeapon(computerChoice, "Computer : ");
+  const userWeapon = exposeWeapon(userChoice, "Player : ");
 
   console.log("\n", computerWeapon, userWeapon);
 
-  if (userChoice === computerChoice) {
-    return "\n  TIE!! You Are Better Than I Thought!\n";
-  }
 
-  return winOrLose(choicePair);
+  return gameOutcome(choicePair, userChoice, computerChoice);
 }
 
 function continueGame() {
   const isReady = confirm("\n Are You Ready To Play Rock Paper Scissor!!");
-
   if (!isReady) {
-    return "\n  🙏🏼 Thanks. Come Again!!\n"
+    return "\n  🙏🏼 Thanks. Come Again!!\n";
   }
 
-  console.log(rockPaperScissor());
+  console.log(initiateRockPaperScissor());
 
   return continueGame();
 }
