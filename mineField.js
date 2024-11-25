@@ -1,13 +1,13 @@
 const boxSize = 7;
 const exit = 1;
-const safePath1 = "49 48 41 34 27 20 19 18 25 32 31 30 23 16 15 8 1";
-const safePath2 = "49 42 41 40 33 26 25 24 31 30 29 22 15 16 9 2 1";
-const safePath3 = "49 48 47 40 33 26 27 20 13 12 11 10 17 16 15 8 1";
-const safePath4 = "49 48 47 46 45 38 31 24 25 26 19 12 11 10 3 2 1";
-const safePath5 = "49 48 41 40 39 38 31 24 25 26 27 20 13 12 5 4 3 10 9 8 1";
-const safePath6 = "49 48 47 40 39 32 31 24 17 18 19 12 5 4 3 2 1";
 
 function getRandomSafePath() {
+  const safePath1 = "49 48 41 34 27 20 19 18 25 32 31 30 23 16 15 8 1";
+  const safePath2 = "49 42 41 40 33 26 25 24 31 30 29 22 15 16 9 2 1";
+  const safePath3 = "49 48 47 40 33 26 27 20 13 12 11 10 17 16 15 8 1";
+  const safePath4 = "49 48 47 46 45 38 31 24 25 26 19 12 11 10 3 2 1";
+  const safePath5 = "49 48 41 40 39 38 31 24 25 26 27 20 13 12 5 4 3 10 9 8 1";
+  const safePath6 = "49 48 47 40 39 32 31 24 17 18 19 12 5 4 3 2 1";
   const pathNumber = Math.ceil(Math.random() * 6);
 
   switch (pathNumber) {
@@ -16,9 +16,8 @@ function getRandomSafePath() {
     case 3: return safePath3;
     case 4: return safePath4;
     case 5: return safePath5;
+    case 6: return safePath6;
   }
-
-  return safePath6;
 }
 
 function matchAtPosition(string, subString, stringIndex) {
