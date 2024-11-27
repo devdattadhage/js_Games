@@ -1,15 +1,17 @@
+const safePath1 = [49, 48, 41, 34, 27, 20, 19, 18, 25, 32, 31, 30, 23, 16, 15, 8, 1];
+const safePath2 = [49, 42, 41, 40, 33, 26, 25, 24, 31, 30, 29, 22, 15, 16, 9, 2, 1];
+const safePath3 = [49, 48, 47, 40, 33, 26, 27, 20, 13, 12, 11, 10, 17, 16, 8, 1];
+const safePath4 = [49, 48, 47, 46, 45, 38, 31, 24, 25, 26, 19, 12, 11, 10, 3, 2, 1];
+const safePath5 = [49, 48, 41, 40, 39, 38, 31, 24, 25, 26, 27, 20, 13, 12, 5, 4, 3, 10, 9, 8, 1];
+const safePath6 = [49, 48, 47, 40, 39, 32, 31, 24, 17, 18, 19, 12, 5, 4, 3, 2, 1];
 const boxSize = 7;
-const exit = 1;
+const exitPosition = 1;
 
-function getRandomSafePath() {
-  const safePath1 = "49 48 41 34 27 20 19 18 25 32 31 30 23 16 15 8 1";
-  const safePath2 = "49 42 41 40 33 26 25 24 31 30 29 22 15 16 9 2 1";
-  const safePath3 = "49 48 47 40 33 26 27 20 13 12 11 10 17 16 15 8 1";
-  const safePath4 = "49 48 47 46 45 38 31 24 25 26 19 12 11 10 3 2 1";
-  const safePath5 = "49 48 41 40 39 38 31 24 25 26 27 20 13 12 5 4 3 10 9 8 1";
-  const safePath6 = "49 48 47 40 39 32 31 24 17 18 19 12 5 4 3 2 1";
-  const pathNumber = Math.ceil(Math.random() * 6);
+function getRandomInteger() {
+  return Math.ceil(Math.random() * 6);
+}
 
+function getRandomSafePath(pathNumber) {
   switch (pathNumber) {
     case 1: return safePath1;
     case 2: return safePath2;
@@ -20,24 +22,9 @@ function getRandomSafePath() {
   }
 }
 
-function matchAtPosition(string, subString, stringIndex) {
-  for (let substrIndex = 0; substrIndex < subString.length; substrIndex++) {
-    if (string[stringIndex + substrIndex] !== subString[substrIndex]) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-function isSubstring(string, subString) {
-  subString += "";
-
-  if (subString === "") {
-    return false;
-  }
-  for (let index = 0; index <= string.length - subString.length; index++) {
-    if (matchAtPosition(string, subString, index)) {
+function isValuePresent(list, value) {
+  for (let index = 0; index < list.length; index++) {
+    if (list[index] === value) {
       return true;
     }
   }
@@ -45,11 +32,19 @@ function isSubstring(string, subString) {
   return false;
 }
 
-function getBombMSG() {
-  return "\n  You Stepped on Mine 💣 !!! ";
+function displayBombMSG() {
+  return console.log("\n  You Stepped on Mine 💣 !!! ");
 }
 
-function createBox(path, currentPosition) {
+function isBombed(path, currentPosition) {
+  if (!isValuePresent(path, currentPosition)) {
+    return true;
+  }
+
+  return false;
+}
+
+function createBox(currentPosition) {
   let box = "\n  ";
 
   for (let index = 1; index <= boxSize * boxSize; index++) {
@@ -58,18 +53,13 @@ function createBox(path, currentPosition) {
     if (index % boxSize === 0) {
       box += " \n  ";
     }
-    if (!isSubstring(path, currentPosition)) {
-      currentPosition = 49;
-      console.log(getBombMSG());
-    }
   }
-  console.log(box);
 
-  return currentPosition;
+  return console.log(box);
 }
 
-function warningMsg() {
-  return "\n ⚠️  Warning!! Incorrect Direction !!! ";
+function displayWarningMsg() {
+  return console.log("\n ⚠️  Warning!! Incorrect Direction !!! ");
 }
 
 function moveUp(currentPosition) {
@@ -97,20 +87,20 @@ function moveRight(currentPosition) {
 }
 
 function controller(userInput, currentPosition) {
-  if (userInput === 'w' || userInput === 'W') {
+  if (userInput === 'W') {
     return moveUp(currentPosition);
   }
-  if (userInput === 's' || userInput === 'S') {
+  if (userInput === 'S') {
     return moveDown(currentPosition);
   }
-  if (userInput === 'a' || userInput === 'A') {
+  if (userInput === 'A') {
     return moveLeft(currentPosition);
   }
-  if (userInput === 'd' || userInput === 'D') {
+  if (userInput === 'D') {
     return moveRight(currentPosition);
   }
 
-  console.log(warningMsg());
+  displayWarningMsg();
   prompt("\n 🙏🏼 Please Enter Valid Instruction ");
 
   return currentPosition;
@@ -129,26 +119,37 @@ function attemptInfo(trialsLeft) {
 }
 
 function displayInfo(trialsLeft) {
-  return directionInfo() + attemptInfo(trialsLeft);
+  return console.log(directionInfo() + attemptInfo(trialsLeft));
 }
 
-function initiateMineField(path, userName, currentPosition, trialsLeft) {
-  console.clear();
-  currentPosition = createBox(path, currentPosition);
+function hasPlayerWon(currentPosition) {
+  return currentPosition === exitPosition;
+}
 
-  if (trialsLeft < 1) {
-    return "\n 💀" + userName + " You're Dead ⚰️ Better Luck In Next Life! ☮️\n";
+function playMineField(path, userName, startPosition, trialsLeft) {
+  let currentPosition = startPosition;
+
+  while (trialsLeft > 0) {
+    console.clear();
+    createBox(currentPosition);
+    displayInfo(trialsLeft);
+
+    const userInput = getUserInput();
+    currentPosition = controller(userInput, currentPosition);
+
+    if (isBombed(path, currentPosition)) {
+      displayBombMSG();
+      prompt("\n  press enter to continue!!");
+      currentPosition = 49;
+      trialsLeft--;
+    }
+
+    if (hasPlayerWon(currentPosition)) {
+      return "\n 🎉🎉 Congratulations " + userName + " 🤩!! You Won 🎉🎉\n";
+    }
   }
-  if (currentPosition === exit) {
-    return "\n 🎉🎉 Congratulations " + userName + " 🤩!! You Won 🎉🎉\n";
-  }
 
-  console.log(displayInfo(trialsLeft));
-  const userInput = getUserInput();
-  currentPosition = controller(userInput, currentPosition);
-  trialsLeft -= isSubstring(path, currentPosition) ? 0 : 1;
-
-  return initiateMineField(path, userName, currentPosition, trialsLeft);
+  return "\n 💀" + userName + " You're Dead ⚰️ Better Luck In Next Life! ☮️\n";
 }
 
 function gameInfo() {
@@ -166,11 +167,12 @@ function beginGame() {
   console.log(gameInfo());
 
   let trialsLeft = 10;
-  let currentPosition = 49;
+  let startPosition = 49;
   const userName = prompt("\n  🙏🏼 Please Enter Your Name To Continue : ");
-  const path = getRandomSafePath();
+  const number = getRandomInteger();
+  const path = getRandomSafePath(number);
 
-  console.log(initiateMineField(path, userName, currentPosition, trialsLeft));
+  console.log(playMineField(path, userName, startPosition, trialsLeft));
 }
 
 beginGame();
